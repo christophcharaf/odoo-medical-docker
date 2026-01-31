@@ -1,0 +1,47 @@
+services:
+  web:
+    build: .
+    image: odoo-medical:17.0
+    container_name: odoo-web
+    ports:
+      - "8069:8069"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - odoo_data:/var/lib/odoo
+      - ./addons:/mnt/extra-addons
+      - ./config/odoo.conf:/etc/odoo/odoo.conf
+    environment:
+      - HOST=db
+      - USER=odoo
+      - PASSWORD=${POSTGRES_PASSWORD:-odoo}
+    networks:
+      - odoo-medical
+    restart: unless-stopped
+
+  db:
+    image: postgres:15-alpine
+    container_name: odoo-db
+    restart: always
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: odoo
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-odoo}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - db_data:/var/lib/postgresql/data/pgdata
+    networks:
+      - odoo-medical
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U odoo"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  odoo_data:
+  db_data:
+
+networks:
+  odoo-medical:
