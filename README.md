@@ -1,11 +1,11 @@
-# Odoo Medical Docker
+# Odoo Hospital Docker
 
-A Docker-based setup for Odoo 17 Community Edition with OCA Medical modules for patient management and scheduling.
+A Docker-based setup for Odoo 17 Community Edition with Hospital Management module for patient management and scheduling.
 
 ## Features
 
 - **Odoo 17 Community Edition**
-- **OCA Medical Modules** (vertical-medical)
+- **Hospital Management Module** ([mahmodDAHOL/odoo_hospital_app](https://github.com/mahmodDAHOL/odoo_hospital_app))
 - **PostgreSQL 15** database
 - **Docker Compose** for easy deployment
 
@@ -20,8 +20,8 @@ A Docker-based setup for Odoo 17 Community Edition with OCA Medical modules for 
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/yourusername/odoo-medical-docker.git
-   cd odoo-medical-docker
+   git clone https://github.com/yourusername/odoo-hospital-docker.git
+   cd odoo-hospital-docker
    ```
 
 2. Copy environment file:
@@ -39,38 +39,37 @@ A Docker-based setup for Odoo 17 Community Edition with OCA Medical modules for 
 ### First-time Setup
 
 1. Create a new database:
-   - Database Name: `medical` (or your choice)
+   - Database Name: `hospital` (or your choice)
    - Email: your admin email
    - Password: your admin password
    - Language: English
    - Country: Your country
 
-2. Install Medical modules:
+2. Install Hospital module:
    - Go to **Apps** menu
-   - Click **Update Apps List** (in the top menu)
-   - Search for `medical`
-   - Install:
-     - `medical` (core)
-     - `medical_administration` (patient records)
-     - `medical_appointment` (scheduling)
+   - Click **Update Apps List** (in the Apps dropdown menu)
+   - Remove the "Apps" filter in the search bar
+   - Search for `hospital`
+   - Install **Hospital Management**
 
-## Module Installation Order
+## Module Features
 
-For best results, install modules in this order:
+The Hospital Management module includes:
 
-1. `medical` - Core medical functionality
-2. `medical_administration` - Patient and practitioner management
-3. `medical_appointment` - Appointment scheduling
+- **Patient Management** - Patient records with tags, gender filters, archived patients
+- **Appointment Scheduling** - Calendar views, status tracking, doctor assignments
+- **Prescriptions** - State and priority management
+- **Operations** - Track medical operations and procedures
 
 ## Directory Structure
 
 ```
-odoo-medical-docker/
+odoo-hospital-docker/
 ├── addons/              # Custom addons (your modules)
 ├── config/
 │   └── odoo.conf        # Odoo configuration
 ├── docker-compose.yml   # Docker services
-├── Dockerfile           # Odoo image with OCA addons
+├── Dockerfile           # Odoo image with hospital module
 ├── .env.example         # Environment variables template
 └── README.md
 ```
@@ -90,40 +89,36 @@ docker-compose logs -f web
 # Rebuild after Dockerfile changes
 docker-compose up -d --build
 
+# Rebuild from scratch (removes volumes)
+docker-compose down -v
+docker-compose build --no-cache
+docker-compose up -d
+
 # Access Odoo shell
-docker-compose exec web odoo shell -d medical
+docker-compose exec web odoo shell -d hospital
 
 # Restart Odoo
 docker-compose restart web
 ```
 
-## Future Expansion
-
-When ready to expand, you can add:
-
-| Phase | Modules |
-|-------|---------|
-| Phase 2 | Invoicing, `medical_clinical` |
-| Phase 3 | Inventory, HR, Sales |
-| Phase 4 | `medical_pharmacy`, `medical_lab` |
-
 ## Backup
 
 ### Database Backup
 ```bash
-docker-compose exec db pg_dump -U odoo medical > backup.sql
+docker-compose exec db pg_dump -U odoo hospital > backup.sql
 ```
 
 ### Database Restore
 ```bash
-docker-compose exec -T db psql -U odoo medical < backup.sql
+docker-compose exec -T db psql -U odoo hospital < backup.sql
 ```
 
 ## Troubleshooting
 
 ### "Module not found" error
 1. Go to Apps → Update Apps List
-2. Search again for the module
+2. Remove the "Apps" filter in search bar
+3. Search again for `hospital`
 
 ### Database connection issues
 ```bash
@@ -136,7 +131,13 @@ docker-compose up -d
 docker-compose exec web chown -R odoo:odoo /var/lib/odoo
 ```
 
+### Clone failed during build
+```bash
+docker-compose build --no-cache
+docker-compose up -d
+```
+
 ## License
 
 - Odoo Community: LGPL-3.0
-- OCA Modules: AGPL-3.0
+- Hospital Module: LGPL-3.0
